@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASHLEY</title>
+    <meta name="description" content="Premium visual network inspired by the future. Engineered for elite creators.">
+    
+    <style>
+        /* ==========================================================================
+        1. DESIGN SYSTEM & VARIABLES
+           ========================================================================== */
+        :root {
+            --bg-base: #030303;
+            --bg-surface: rgba(18, 18, 18, 0.4);
+            --bg-card: rgba(10, 10, 10, 0.5);
+            --border-glow: rgba(255, 255, 255, 0.06);
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent: #ffffff;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --blur-radius: 20px;
+            --transition-ultra: cubic-bezier(0.25, 1, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ==========================================================================
+        2. CINEMATIC BACKGROUNDS
+           ========================================================================== */
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; overflow: hidden; pointer-events: none; opacity: 0.5;
+        }
+        .aurora-sphere {
+            position: absolute; bottom: -10%; right: -20%; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(102,51,255,0.15) 0%, rgba(0,0,0,0) 70%); filter: blur(60px);
+            animation: floatAurora 15s infinite alternate var(--transition-ultra);
+        }
+        .aurora-sphere-2 {
+            position: absolute; top: -10%; left: -20%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,51,102,0.1) 0%, rgba(0,0,0,0) 70%); filter: blur(70px);
+            animation: floatAurora 12s infinite alternate-reverse var(--transition-ultra);
+        }
+        @keyframes floatAurora { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 30px) scale(1.15); } }
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+        /* ==========================================================================
+        3. MOBILE OPTIMIZED GLASS HEADER
+           ========================================================================== */
+        .glass-header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px; 
+            background: var(--bg-surface); backdrop-filter: blur(var(--blur-radius)); -webkit-backdrop-filter: blur(var(--blur-radius)); 
+            border-bottom: 1px solid var(--border-glow); z-index: 1000; 
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+        }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+        .nav-menu { display: flex; gap: 16px; list-style: none; }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.3s; }
+        .nav-link.active { color: var(--text-primary); }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { background: none; border: none; color: var(--text-primary); position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glow); }
+        .notification-badge { position: absolute; top: 9px; right: 9px; width: 5px; height: 5px; background: #ff3366; border-radius: 50%; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-glow); }
+
+        /* ==========================================================================
+        4. SINGLE CARD CONTAINER & ULTRA TRANSITION EFFECT
+           ========================================================================== */
+        main { 
+            position: fixed; top: 70px; bottom: 0; left: 0; width: 100%; 
+            display: flex; align-items: center; justify-content: center; 
+            padding: 16px 20px; z-index: 10; 
+        }
+
+        .card-container {
+            width: 100%;
+            height: 100%;
+            max-height: 720px;
+            max-width: 430px;
+            position: relative;
+            perspective: 1200px;
+        }
+
+        .premium-card { 
+            position: absolute; width: 100%; height: 100%; 
+            background: var(--bg-card); border: 1px solid var(--border-glow); 
+            border-radius: 28px; overflow: hidden; 
+            display: flex; flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transform-style: preserve-3d;
+            will-change: transform, opacity, filter;
+        }
+
+        .card-media-box { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+            overflow: hidden; background: #000; 
+        }
+        
+        .card-img { 
+            width: 100%; height: 100%; display: block; object-fit: cover; 
+            will-change: transform, filter;
+        }
+
+        .card-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to top, rgba(3,3,3,0.95) 0%, rgba(3,3,3,0.3) 50%, rgba(0,0,0,0) 100%); 
+            display: flex; flex-direction: column; justify-content: flex-end; 
+            padding: 24px; z-index: 2; 
+        }
+
+
+        /* ==========================================================================
+        BADGE LIVE
+           ========================================================================== */
+        .live-badge {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: rgba(255, 51, 102, 0.15);
+            border: 1px solid rgba(255, 51, 102, 0.4);
+            color: #ff3366;
+            padding: 6px 13px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #ff3366;
+            border-radius: 50%;
+            animation: pulseLive 1.5s infinite;
+        }
+
+        @keyframes pulseLive {
+            0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(255, 51, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+        }
+
+        .card-content {
+            will-change: transform, opacity;
+            transition: transform 0.6s var(--transition-ultra), opacity 0.6s var(--transition-ultra);
+        }
+
+        .card-category { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 700; display: block; }
+        .card-title { font-size: 24px; font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 16px; }
+        
+        .card-footer { 
+            display: flex; align-items: center; justify-content: space-between; width: 100%;
+            padding-top: 4px;
+        }
+        .author-info { display: flex; align-items: center; gap: 10px; }
+        .author-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .author-name { font-size: 13px; color: var(--text-primary); font-weight: 600; }
+        
+        .action-btn { 
+            background: #ffffff; border: none;
+            padding: 10px 20px; border-radius: 20px; color: #000000; 
+            font-size: 13px; font-weight: 700; transition: transform 0.2s; 
+        }
+        .action-btn:active { transform: scale(0.95); }
+
+        /* Paginador lateral sutil al estilo de la referencia */
+        .card-pagination {
+            position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 8px; z-index: 20;
+        }
+        .pagination-dot {
+            width: 5px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 50%;
+            transition: all 0.4s var(--transition-ultra);
+        }
+        .pagination-dot.active {
+            background: #fff; transform: scale(1.4); box-shadow: 0 0 8px #fff;
+        }
+
+        /* Ocultar elementos de escritorio por completo */
+        .search-container { display: none; }
+
+        /* ==========================================================================
+        5. CLASES DE ANIMACIÓN ULTRA EFECTO (Siguiente tarjeta / Salida)
+           ========================================================================== */
+        .effect-out {
+            animation: ultraExit 0.85s var(--transition-ultra) forwards;
+        }
+
+        .effect-in {
+            animation: ultraEnter 0.85s var(--transition-ultra) forwards;
+        }
+
+        @keyframes ultraExit {
+            0% { transform: scale(1) rotateY(0deg); opacity: 1; filter: blur(0px); }
+            40% { opacity: 0.6; }
+            100% { transform: scale(0.85) rotateY(-30deg) translateZ(-100px); opacity: 0; filter: blur(15px); }
+        }
+
+        @keyframes ultraEnter {
+            0% { transform: scale(1.15) rotateY(30deg) translateZ(100px); opacity: 0; filter: blur(15px); }
+            30% { opacity: 0.3; }
+            100% { transform: scale(1) rotateY(0deg) translateZ(0); opacity: 1; filter: blur(0px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-bg">
+        <div class="aurora-sphere"></div>
+        <div class="aurora-sphere-2"></div>
+    </div>
+    <canvas id="particle-canvas"></canvas>
+
+    <header class="glass-header">
+        <div class="header-left">
+            <div class="logo">Aura</div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="https://myaurahub.github.io/MY/" class="nav-link active">Explorar</a></li>
+                    <li><a href="https://myaurahub.github.io/MY/" class="nav-link">Tendencias</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="header-right">
+            <a href="https://myaurahub.github.io/MY/" class="icon-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                <div class="notification-badge"></div>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+            </a>
+            <img src="fotos/1.jpg" alt="Avatar" class="user-avatar" id="js-header-avatar">
+        </div>
+    </header>
+
+    <main>
+        <div class="card-container">
+            <div id="js-card-anchor" style="width:100%; height:100%;"></div>
+            
+            <div class="card-pagination" id="js-pagination"></div>
+        </div>
+    </main>
+
+    <script>
+        // DATA SET ACTUALIZADO PARA VIDEOS
+        const ASSET_PIPELINE = [
+            { title: "DIA DE SUERTE", video: "1.mp4", user: "ASHLEY", avatar: "1-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "MOMENTO ESPECIAL", video: "2.mp4", user: "VERONICA", avatar: "2-2.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "NUEVA EXPERIENCIA", video: "3.mp4", user: "VALERIE", avatar: "3-3.JPG", url: "https://myaurahub.github.io/MY/" },
+            { title: "LUZ & PRESENCIA", video: "4.mp4", user: "YULISSA", avatar: "4-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "ALGO DIFERENTE", video: "5.mp4", user: "MONICA", avatar: "5-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "TENDENCIA DEL DÍA", video: "6.mov", user: "LILIANA", avatar: "1-1.pNg", url: "https://myaurahub.github.io/MY/" },
+            { title: "NO TE LO PIERDAS", video: "7.mp4", user: "NATHALIA", avatar: "10-1.pNg", url: "https://myaurahub.github.io/MY/" },
+            { title: "DESCUBRIMIENTO DEL DÍA", video: "8.mp4", user: "SOPHIE", avatar: "8-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "SORPRESA DEL MOMENTO", video: "9.mp4", user: "ESTEPHANIE", avatar: "9-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "SORPRESA DEL MOMENTO", video: "10.mp4", user: "ANDREA", avatar: "10-1.png", url: "https://myaurahub.github.io/MY/" },
+            { title: "SORPRESA DEL MOMENTO", video: "11.mp4", user: "LINDA", avatar: "1-1.png", url: "https://myaurahub.github.io/MY/" },
+        ];
+
+        let currentIndex = 0;
+        const container = document.getElementById("js-card-anchor");
+        const pagination = document.getElementById("js-pagination");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initParticleBackground();
+            buildPagination();
+            renderCard(currentIndex);
+            
+            // Ciclo infinito automatizado cada 2050 segundos (2050 * 1000 milisegundos).
+            // Si tu intención era mantenerlo en 2.05 segundos, cambia esto a solo "2050".
+            setInterval(nextCardSequence, 4050); 
+        });
+
+        function buildPagination() {
+            pagination.innerHTML = "";
+            ASSET_PIPELINE.forEach((_, index) => {
+                const dot = document.createElement("div");
+                dot.className = `pagination-dot ${index === 0 ? 'active' : ''}`;
+                pagination.appendChild(dot);
+            });
+        }
+
+        function updatePagination(index) {
+            const dots = document.querySelectorAll(".pagination-dot");
+            dots.forEach((dot, idx) => {
+                if(idx === index) dot.classList.add("active");
+                else dot.classList.remove("active");
+            });
+        }
+
+        function createCardElement(data) {
+            const card = document.createElement("div");
+            card.className = "premium-card";
+            card.innerHTML = `
+                <div class="card-media-box">
+                    <video src="${data.video}" class="card-img" autoplay loop muted playsinline></video>
+                </div>
+                <div class="card-overlay">
+                    <div class="live-badge">
+                        <span class="live-dot"></span> LIVE
+                    </div>
+                    
+                    <div class="card-content">
+                        <h2 class="card-title">${data.title}</h2>
+                        <div class="card-footer">
+                            <div class="author-info">
+                                <img src="${data.avatar}" class="author-avatar" alt="${data.user}">
+                                <span class="author-name">${data.user}</span>
+                            </div>
+                            <a href="https://myaurahub.github.io/MY/" class="action-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Explorar</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            card.style.cursor = "pointer";
+
+            card.addEventListener("click", () => {
+                window.location.href = data.url;
+            });
+
+            return card;
+        }
+
+        function renderCard(index) {
+            container.innerHTML = "";
+            const currentCard = createCardElement(ASSET_PIPELINE[index]);
+            container.appendChild(currentCard);
+            
+            // Actualizar avatar dinámico de cabecera opcionalmente basado en la tarjeta activa
+            document.getElementById("js-header-avatar").src = ASSET_PIPELINE[index].avatar;
+        }
+
+        function nextCardSequence() {
+            const oldCard = container.querySelector(".premium-card");
+            let nextIndex = (currentIndex + 1) % ASSET_PIPELINE.length;
+            
+            const newCard = createCardElement(ASSET_PIPELINE[nextIndex]);
+            
+            // Aplicar clase de salida ultra visual a la tarjeta vieja
+            if (oldCard) {
+                oldCard.classList.add("effect-out");
+            }
+            
+            // Inyectar y animar entrada tridimensional de la nueva tarjeta
+            newCard.classList.add("effect-in");
+            container.appendChild(newCard);
+            
+            // Actualizar estado del paginador
+            currentIndex = nextIndex;
+            updatePagination(currentIndex);
+
+            // Limpieza del DOM tras la finalización del efecto visual
+            setTimeout(() => {
+                if (oldCard && oldCard.parentNode) {
+                    oldCard.remove();
+                }
+                newCard.classList.remove("effect-in");
+                document.getElementById("js-header-avatar").src = ASSET_PIPELINE[currentIndex].avatar;
+            }, 850);
+        }
+
+        /* FONDO CINEMÁTICO DE PARTÍCULAS */
+        function initParticleBackground() {
+            const canvas = document.getElementById("particle-canvas"); 
+            const ctx = canvas.getContext("2d"); 
+            let particles = [];
+            
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener("resize", resize); resize();
+            
+            class Particle {
+                constructor() { 
+                    this.x = Math.random() * canvas.width; 
+                    this.y = Math.random() * canvas.height; 
+                    this.size = Math.random() * 1.2 + 0.4; 
+                    this.speedY = Math.random() * -0.2 - 0.05; 
+                    this.alpha = Math.random() * 0.4 + 0.1; 
+                }
+                update() { 
+                    this.y += this.speedY; 
+                    if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; } 
+                }
+                draw() { 
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`; 
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                    ctx.fill(); 
+                }
+            }
+            for (let i = 0; i < 40; i++) particles.push(new Particle());
+            function loop() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(loop); }
+            loop();
+        }
+    </script>
+</body>
+</html>
