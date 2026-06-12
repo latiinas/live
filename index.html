@@ -285,6 +285,13 @@
             initParticleBackground();
             buildPagination();
             renderCard(currentIndex);
+            // Añade esto en tu script, dentro de document.addEventListener("DOMContentLoaded", ...)
+document.body.addEventListener('touchstart', () => {
+    const video = document.querySelector('video');
+    if (video && video.paused) {
+        video.play();
+    }
+}, { once: true }); // Solo se ejecuta la primera vez que el usuario toca la pantalla
             
             // Ciclo infinito automatizado cada 2050 segundos (2050 * 1000 milisegundos).
             // Si tu intención era mantenerlo en 2.05 segundos, cambia esto a solo "2050".
@@ -345,7 +352,7 @@
     const video = cardElement.querySelector('video');
     if (video) {
         // 1. Redefinir 'muted' a nivel de propiedad es vital en iOS para inyecciones JS
-        video.muted = false; 
+        video.muted = true; 
         
         // 2. Forzar la reproducción y capturar la Promesa para evitar errores
         const playPromise = video.play();
@@ -365,7 +372,7 @@
             container.appendChild(currentCard);
 
             // 🔥 FORZAR EL PLAY AQUÍ 🔥
-    forceVideoPlay(currentCard);
+            forceVideoPlay(currentCard);
             // Actualizar avatar dinámico de cabecera opcionalmente basado en la tarjeta activa
             document.getElementById("js-header-avatar").src = ASSET_PIPELINE[index].avatar;
         }
