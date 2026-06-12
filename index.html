@@ -385,6 +385,9 @@
             // Inyectar y animar entrada tridimensional de la nueva tarjeta
             newCard.classList.add("effect-in");
             container.appendChild(newCard);
+
+            // 🔥 FORZAR EL PLAY AQUÍ TAMBIÉN 🔥
+            forceVideoPlay(newCard);
             
             // Actualizar estado del paginador
             currentIndex = nextIndex;
