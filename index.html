@@ -235,10 +235,9 @@
 
     <header class="glass-header">
         <div class="header-left">
-            <div class="logo">Aura</div>
+            <div class="logo">LATINAS</div>
             <nav>
                 <ul class="nav-menu">
-                    <li><a href="https://myaurahub.github.io/MY/" class="nav-link active">Explorar</a></li>
                     <li><a href="https://myaurahub.github.io/MY/" class="nav-link">Tendencias</a></li>
                 </ul>
             </nav>
@@ -346,7 +345,7 @@
     const video = cardElement.querySelector('video');
     if (video) {
         // 1. Redefinir 'muted' a nivel de propiedad es vital en iOS para inyecciones JS
-        video.muted = true; 
+        video.muted = false; 
         
         // 2. Forzar la reproducción y capturar la Promesa para evitar errores
         const playPromise = video.play();
