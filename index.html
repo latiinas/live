@@ -320,7 +320,7 @@ document.body.addEventListener('touchstart', () => {
             card.className = "premium-card";
             card.innerHTML = `
                 <div class="card-media-box">
-                    <video src="${data.video}" class="card-img" autoplay loop muted playsinline></video>
+                    <video src="${data.video}" class="card-img" autoplay loop muted playsinline preload="auto"></video>
                 </div>
                 <div class="card-overlay">
                     <div class="live-badge">
@@ -350,19 +350,18 @@ document.body.addEventListener('touchstart', () => {
 
         function forceVideoPlay(cardElement) {
     const video = cardElement.querySelector('video');
-    if (video) {
-        // 1. Redefinir 'muted' a nivel de propiedad es vital en iOS para inyecciones JS
-        video.muted = true; 
-        
-        // 2. Forzar la reproducción y capturar la Promesa para evitar errores
-        const playPromise = video.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.warn("Autoplay bloqueado por las políticas del navegador:", error);
-            });
-        }
-    }
+
+    if (!video) return;
+
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+
+    video.addEventListener('loadeddata', () => {
+        video.play().catch(err => {
+            console.log('Autoplay bloqueado:', err);
+        });
+    });
 }
         
 
