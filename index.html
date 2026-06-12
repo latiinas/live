@@ -342,11 +342,31 @@
             return card;
         }
 
+        function forceVideoPlay(cardElement) {
+    const video = cardElement.querySelector('video');
+    if (video) {
+        // 1. Redefinir 'muted' a nivel de propiedad es vital en iOS para inyecciones JS
+        video.muted = true; 
+        
+        // 2. Forzar la reproducción y capturar la Promesa para evitar errores
+        const playPromise = video.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.warn("Autoplay bloqueado por las políticas del navegador:", error);
+            });
+        }
+    }
+}
+        
+
         function renderCard(index) {
             container.innerHTML = "";
             const currentCard = createCardElement(ASSET_PIPELINE[index]);
             container.appendChild(currentCard);
-            
+
+            // 🔥 FORZAR EL PLAY AQUÍ 🔥
+    forceVideoPlay(currentCard);
             // Actualizar avatar dinámico de cabecera opcionalmente basado en la tarjeta activa
             document.getElementById("js-header-avatar").src = ASSET_PIPELINE[index].avatar;
         }
